@@ -4,6 +4,21 @@ document.addEventListener("DOMContentLoaded", function () {
     const copyBtn = document.getElementById("copy-btn");
     const passwordStrength = document.getElementById("password-strength");
     const toggleVisibility = document.getElementById("toggle-visibility");
+    const lengthInput = document.getElementById("length");
+    const errorMessage = document.getElementById("error-message");
+
+    function validateInput() {
+        const length = lengthInput.value.trim();
+
+        // Verifica que el valor sea un número entero válido y esté en el rango
+        if (!/^\d+$/.test(length) || length < 4 || length > 50) {
+            errorMessage.textContent = "Ingrese un número entre 4 y 50.";
+            generateBtn.disabled = true;
+        } else {
+            errorMessage.textContent = "";
+            generateBtn.disabled = false;
+        }
+    }
 
     function updateStrength(password) {
         let strength = 0;
@@ -29,7 +44,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     
     function generatePassword() {
-        const length = document.getElementById("length").value;
+        if (generateBtn.disabled) {
+            return; // Evita generar la contraseña si la longitud es inválida
+        }
+
+        const length = parseInt(lengthInput.value);
         const useDigits = document.getElementById("use-digits").checked;
         const useSpecials = document.getElementById("use-specials").checked;
         
@@ -39,32 +58,38 @@ document.addEventListener("DOMContentLoaded", function () {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                length: parseInt(length),
+                length: length,
                 use_digits: useDigits,
                 use_specials: useSpecials
             })
         })
         .then(response => response.json())
         .then(data => {
-            passwordField.value = data.password;
-            updateStrength(data.password);
-            saveToFile(data.password);
+            if (data.error) {
+                errorMessage.textContent = data.error; // Muestra el error si lo hay
+                passwordField.value = "";
+            } else {
+                passwordField.value = data.password;
+                updateStrength(data.password);
+                saveToFile(data.password);
+            }
         })
         .catch(error => console.error("Error al generar la contraseña:", error));
     }
-    
+
+    lengthInput.addEventListener("input", validateInput);
     generateBtn.addEventListener("click", generatePassword);
-    
+
     document.addEventListener("keydown", function (event) {
-        if (event.key === "Enter") {
+        if (event.key === "Enter" && !generateBtn.disabled) {
             generatePassword();
         }
     });
-    
+
     copyBtn.addEventListener("click", function () {
         navigator.clipboard.writeText(passwordField.value);
     });
-    
+
     toggleVisibility.addEventListener("click", function () {
         if (passwordField.type === "password") {
             passwordField.type = "text";
