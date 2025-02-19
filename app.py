@@ -1,0 +1,34 @@
+from flask import Flask, render_template, request, jsonify
+import random
+import string
+
+app = Flask(__name__)
+
+def generate_password(length=12, use_digits=True, use_specials=True):
+    """Genera una contraseña aleatoria según los parámetros proporcionados."""
+    characters = string.ascii_letters  # Letras mayúsculas y minúsculas
+    if use_digits:
+        characters += string.digits
+    if use_specials:
+        characters += string.punctuation
+    
+    password = ''.join(random.choice(characters) for _ in range(length))
+    return password
+
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+@app.route('/generate', methods=['POST'])
+def generate():
+    """Maneja la petición para generar una contraseña."""
+    data = request.json
+    length = data.get('length', 12)
+    use_digits = data.get('use_digits', True)
+    use_specials = data.get('use_specials', True)
+    
+    password = generate_password(length, use_digits, use_specials)
+    return jsonify({"password": password})
+
+if __name__ == '__main__':
+    app.run(debug=True)
