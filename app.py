@@ -15,9 +15,27 @@ def generate_password(length=12, use_digits=True, use_specials=True):
     password = ''.join(random.choice(characters) for _ in range(length))
     return password
 
+def generate_email():
+    """Genera un correo electrónico aleatorio."""
+    names = ["user", "test", "random", "guest", "member"]
+    domains = ["gmail", "yahoo", "outlook", "hotmail", "protonmail"]
+    extensions = [".com", ".net", ".org", ".io"]
+
+    username = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+    domain = random.choice(domains)
+    extension = random.choice(extensions)
+
+    email = f"{username}@{domain}{extension}"
+    return email
+
+
 @app.route('/')
 def home():
     return render_template('index.html')
+
+@app.route('/email')
+def email():
+    return render_template('/email.html')
 
 @app.route('/generate', methods=['POST'])
 def generate():
@@ -29,6 +47,12 @@ def generate():
     
     password = generate_password(length, use_digits, use_specials)
     return jsonify({"password": password})
+
+@app.route('/generate_email', methods=['GET'])
+def generate_random_email():
+    """Genera y devuelve un email aleatorio."""
+    email = generate_email()
+    return jsonify({"email": email})
 
 if __name__ == '__main__':
     app.run(debug=True)
