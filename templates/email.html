@@ -26,21 +26,46 @@
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #444;">
     <div class="container-fluid px-4">
+      <!-- Logo + Ironpass -->
       <a class="navbar-brand d-flex align-items-center" href="/">
-        <img src="/static/img/logo.png" alt="Logo Ironpass" style="height: 80px; margin-right: 16px;">
+        <img
+          src="/static/img/logo.png"
+          alt="Logo Ironpass"
+          style="height: 80px; margin-right: 16px;"
+        >
       </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
         <span class="navbar-toggler-icon"></span>
       </button>
+
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <!-- Opciones de la navbar -->
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link" href="/index">Opcion 1</a>
+            <a class="nav-link active" href="/genuser">Generador de usuarios</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link active" href="#">Opcion 2</a>
+            <a class="nav-link" href="/email">Generador de emails</a>
           </li>
         </ul>
+        <!-- Botón modo claro/oscuro (al final) -->
+        <button
+          id="toggle-theme-btn"
+          class="btn"
+          type="button"
+          aria-label="Cambiar tema"
+        >
+          <i class="fa-solid fa-sun fa-lg"></i>
+        </button>
       </div>
     </div>
   </nav>
