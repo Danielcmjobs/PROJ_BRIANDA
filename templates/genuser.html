@@ -5,10 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Ironpass - Generador de Usuarios</title>
 
+
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Font Awesome (para iconos) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
   <style>
     .dark-mode { background-color: #576069 !important; color: #f8f9fa !important; }
@@ -19,16 +22,17 @@
 </head>
 <body class="bg-light">
 
+
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #444;">
         <div class="container-fluid px-4">
           <a class="navbar-brand d-flex align-items-center" href="/">
             <img src="/static/img/logo.png" alt="Logo Ironpass" style="height: 80px; margin-right: 16px;">
           </a>
-    
+   
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
-    
+   
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               <li class="nav-item"><a class="nav-link active" href="/genuser">Generador de usuarios</a></li>
@@ -38,9 +42,11 @@
         </div>
       </nav>
 
+
   <div class="container mt-5 text-center">
     <div class="card mx-auto p-4 shadow-sm" style="max-width: 700px;">
       <h2 class="mb-4">Generador de Nombres de Usuario</h2>
+      <p>Esta aplicación genera nombres de usuario aleatorios, con la posibilidad de copiarlos, descargarlos y eliminarlos.</p>
       <div class="mb-4">
         <h5 class="mb-3">Nombre generado:</h5>
         <div class="input-group input-group-lg">
@@ -49,12 +55,13 @@
           <button id="copy-btn" class="btn btn-grey"><i class="fa-solid fa-copy"></i> Copiar</button>
         </div>
       </div>
-      
+     
       <h5 class="mt-4">Historial de nombres generados:</h5>
       <ul id="history-list" class="list-group mt-3"></ul>
       <button id="download-all-btn" class="btn btn-grey mt-3"><i class="fa-solid fa-download"></i> Descargar Todos</button>
     </div>
   </div>
+
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

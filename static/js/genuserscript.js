@@ -5,7 +5,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const historyList = document.getElementById("history-list");
     const downloadAllBtn = document.getElementById("download-all-btn");
 
+
     let history = []; // Historial de nombres
+
 
     function generateUsername() {
         fetch('/generate_username')
@@ -17,36 +19,85 @@ document.addEventListener("DOMContentLoaded", function () {
             .catch(error => console.error('Error:', error));
     }
 
+
     function addToHistory(username) {
         if (!history.includes(username)) {
             history.unshift(username); // Añadir al principio para invertir el orden
 
+
             if (history.length > 10) {
                 history.pop(); // Limitar a 10 elementos
             }
+
 
             // Actualizar el historial en la interfaz
             updateHistoryList();
         }
     }
 
+
     function updateHistoryList() {
         historyList.innerHTML = ''; // Limpiar la lista actual
+
 
         history.forEach(username => {
             const listItem = document.createElement("li");
             listItem.className = "list-group-item d-flex justify-content-between align-items-center";
+            listItem.setAttribute("data-username", username);
             listItem.textContent = username;
 
+
+            // Contenedor de botones
+            const buttonContainer = document.createElement("div");
+            buttonContainer.className = "d-flex gap-2";
+
+
+            // Botón de copiar
+            const copyBtn = document.createElement("button");
+            copyBtn.className = "btn btn-sm btn-grey";
+            copyBtn.innerHTML = '<i class="fa-solid fa-copy"></i>';
+            copyBtn.onclick = () => copySelected(username);
+
+
+            // Botón de eliminar
+            const deleteBtn = document.createElement("button");
+            deleteBtn.className = "btn btn-sm btn-danger";
+            deleteBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
+            deleteBtn.onclick = () => deleteFromHistory(username);
+
+
+            // Botón de descargar
             const downloadBtn = document.createElement("button");
             downloadBtn.className = "btn btn-sm btn-grey";
             downloadBtn.innerHTML = '<i class="fa-solid fa-download"></i>';
             downloadBtn.onclick = () => downloadSingle(username);
 
-            listItem.appendChild(downloadBtn);
+
+            // Agregar botones al contenedor
+            buttonContainer.appendChild(copyBtn);
+            buttonContainer.appendChild(deleteBtn);
+            buttonContainer.appendChild(downloadBtn);
+
+
+            // Agregar contenedor al elemento de historial
+            listItem.appendChild(buttonContainer);
             historyList.appendChild(listItem);
         });
     }
+
+
+    function copySelected(username) {
+        navigator.clipboard.writeText(username)
+            .then(() => Swal.fire("Nombre copiado"))
+            .catch(err => console.error("Error al copiar:", err));
+    }
+
+
+    function deleteFromHistory(username) {
+        history = history.filter(user => user !== username);
+        updateHistoryList();
+    }
+
 
     function copyToClipboard() {
         const copyText = usernameField.value;
@@ -54,12 +105,11 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("No hay nombre de usuario para copiar.");
             return;
         }
-        navigator.clipboard.writeText(copyText).then(() => {
-            alert("¡Nombre copiado!");
-        }).catch(err => {
-            console.error("Error al copiar:", err);
-        });
+        navigator.clipboard.writeText(copyText)
+            .then(() => alert("¡Nombre copiado!"))
+            .catch(err => console.error("Error al copiar:", err));
     }
+
 
     function downloadSingle(username) {
         const blob = new Blob([username], { type: "text/plain" });
@@ -68,6 +118,7 @@ document.addEventListener("DOMContentLoaded", function () {
         link.download = `${username}.txt`;
         link.click();
     }
+
 
     function downloadAll() {
         if (history.length === 0) return;
@@ -78,9 +129,11 @@ document.addEventListener("DOMContentLoaded", function () {
         link.click();
     }
 
+
     generateBtn.addEventListener("click", generateUsername);
     copyBtn.addEventListener("click", copyToClipboard);
     downloadAllBtn.addEventListener("click", downloadAll);
+
 
     // Cargar historial al inicio
     fetch('/get_history')
