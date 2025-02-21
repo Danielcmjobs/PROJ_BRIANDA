@@ -1,8 +1,10 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify 
 import random
 import string
 
 app = Flask(__name__)
+
+existing_usernames = set()
 
 def generate_password(length=12, use_digits=True, use_specials=True):
     """Genera una contraseña aleatoria según los parámetros proporcionados."""
@@ -33,7 +35,6 @@ def generate_email(names=None, domains=None, extensions=None):
     email = f"{username}@{domain}{extension}"
     return email
 
-
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -57,20 +58,24 @@ def generate():
     password = generate_password(length, use_digits, use_specials)
     return jsonify({"password": password})
 
-
-
 def generate_username():
-    """Genera un nombre de usuario aleatorio."""
+    """Genera un nombre de usuario aleatorio sin repetir."""
     prefixes = ["Dark", "Shadow", "Fire", "Crystal", "Magic", "Silver", "Golden"]
     suffixes = ["Wolf", "Fox", "Gamer", "Dragon", "Phantom", "Hunter", "Knight"]
-    random_prefix = random.choice(prefixes)
-    random_suffix = random.choice(suffixes)
-    random_num = random.randint(0, 99)
-    return f"{random_prefix}{random_suffix}{random_num}"[:20]
+    
+    while True:
+        random_prefix = random.choice(prefixes)
+        random_suffix = random.choice(suffixes)
+        random_num = random.randint(0, 99)
+        username = f"{random_prefix}{random_suffix}{random_num}"[:20]
+        
+        if username not in existing_usernames:
+            existing_usernames.add(username)
+            return username
 
 @app.route('/generate_username', methods=['GET'])
 def generate_random_username():
-    """Genera y devuelve un nombre de usuario aleatorio."""
+    """Genera y devuelve un nombre de usuario aleatorio único."""
     username = generate_username()
     return jsonify({"username": username})
 
@@ -84,8 +89,6 @@ def generate_custom_email():
 
     email = generate_email(names, domains, extensions)
     return jsonify({"email": email})
-
-
 
 if __name__ == '__main__':
     app.run(debug=True)
