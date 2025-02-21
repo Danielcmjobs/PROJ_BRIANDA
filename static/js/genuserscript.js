@@ -5,31 +5,35 @@ document.addEventListener("DOMContentLoaded", function () {
     const copyBtn = document.getElementById("copy-btn");
     const historyList = document.getElementById("history-list");
     const downloadAllBtn = document.getElementById("download-all-btn");
-    
-    const history = [];
+
+    const history = new Set(); // Usamos un Set para evitar duplicados
 
     function generateUsername() {
         fetch('/generate_username')
             .then(response => response.json())
             .then(data => {
-                usernameField.value = data.username;
-                addToHistory(data.username);
+                if (!history.has(data.username)) { 
+                    usernameField.value = data.username;
+                    addToHistory(data.username);
+                } else {
+                    generateUsername(); // Si el nombre ya existe, generamos otro
+                }
             })
             .catch(error => console.error('Error:', error));
     }
 
     function addToHistory(username) {
-        if (!history.includes(username)) {
-            history.push(username);
+        if (!history.has(username)) {
+            history.add(username);
             const listItem = document.createElement("li");
             listItem.className = "list-group-item d-flex justify-content-between align-items-center";
             listItem.textContent = username;
-            
+
             const downloadBtn = document.createElement("button");
             downloadBtn.className = "btn btn-sm btn-grey";
             downloadBtn.innerHTML = '<i class="fa-solid fa-download"></i>';
             downloadBtn.onclick = () => downloadSingle(username);
-            
+
             listItem.appendChild(downloadBtn);
             historyList.appendChild(listItem);
         }
@@ -37,6 +41,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function copyToClipboard() {
         const copyText = usernameField.value;
+        if (copyText.trim() === "") {
+            alert("No hay nombre de usuario para copiar.");
+            return;
+        }
         navigator.clipboard.writeText(copyText).then(() => {
             alert("¡Nombre copiado!");
         }).catch(err => {
@@ -53,8 +61,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function downloadAll() {
-        if (history.length === 0) return;
-        const blob = new Blob([history.join("\n")], { type: "text/plain" });
+        if (history.size === 0) return;
+        const blob = new Blob([Array.from(history).join("\n")], { type: "text/plain" });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
         link.download = "historial_usuarios.txt";
