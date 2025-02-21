@@ -69,28 +69,32 @@
 
       <!-- Campos de entrada para personalización -->
       <div class="mb-3">
-        <label for="custom-names" class="form-label">Nombres (separados por coma)</label>
-        <input type="text" id="custom-names" class="form-control" placeholder="Ej: juan, maria, pedro">
-      </div>
-      
-      <div class="mb-3">
-        <label for="custom-domains" class="form-label">Dominios (separados por coma)</label>
-        <input type="text" id="custom-domains" class="form-control" placeholder="Ej: gmail, yahoo, outlook">
-      </div>
-      
-      <div class="mb-3">
-        <label for="custom-extensions" class="form-label">Extensiones (separadas por coma)</label>
-        <input type="text" id="custom-extensions" class="form-control" placeholder="Ej: .com, .net, .org">
-      </div>
-      
-
-      
-
+        <label for="names">Palabras clave (nombres):</label>
+        <input type="text" id="names" class="form-control" placeholder="Ej: Juan, Maria, Pedro">
+    </div>
+    
+    <div class="mb-3">
+        <label for="domains">Dominios personalizados:</label>
+        <input type="text" id="domains" class="form-control" placeholder="Ej: gmail, empresa, yahoo">
+    </div>
+    
+    <div class="mb-3">
+        <label for="extensions">Extensiones de correo:</label>
+        <input type="text" id="extensions" class="form-control" placeholder="Ej: .com, .net, .org">
+    </div>
+    
+    <button id="generate-email-btn" class="btn btn-primary mt-3">Generar Nuevo Email</button>
+    
+    <h4 class="mt-4">Historial de Emails Generados:</h4>
+    <ul id="email-history" class="list-group mt-2"></ul>
+    
+    <button id="download-history-btn" class="btn btn-success mt-3">Descargar Historial</button>
+    
       <!-- Campo de resultado y botón de generación -->
       <div class="mb-4 text-center">
         <h5 class="mb-3">Email generado:</h5>
         <input type="text" id="generated-email" class="form-control text-center" readonly>
-        <button id="generate-email-btn" class="btn btn-primary mt-3">Generar Nuevo Email</button>
+   
       </div>
 
       <h4 class="mt-4">¿Por qué usar emails generados?</h4>
