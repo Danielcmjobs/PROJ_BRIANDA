@@ -15,13 +15,18 @@ def generate_password(length=12, use_digits=True, use_specials=True):
     password = ''.join(random.choice(characters) for _ in range(length))
     return password
 
-def generate_email():
-    """Genera un correo electrónico aleatorio."""
-    names = ["user", "test", "random", "guest", "member"]
-    domains = ["gmail", "yahoo", "outlook", "hotmail", "protonmail"]
-    extensions = [".com", ".net", ".org", ".io"]
+def generate_email(names=None, domains=None, extensions=None):
+    """Genera un correo electrónico basado en palabras clave del usuario."""
+    default_names = ["user", "test", "random", "guest", "member"]
+    default_domains = ["gmail", "yahoo", "outlook", "hotmail", "protonmail"]
+    default_extensions = [".com", ".net", ".org", ".io"]
 
-    username = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+    # Si el usuario proporciona valores, los usamos; si no, usamos los predeterminados
+    names = names if names else default_names
+    domains = domains if domains else default_domains
+    extensions = extensions if extensions else default_extensions
+
+    username = random.choice(names) + ''.join(random.choices(string.digits, k=4))
     domain = random.choice(domains)
     extension = random.choice(extensions)
 
@@ -52,11 +57,7 @@ def generate():
     password = generate_password(length, use_digits, use_specials)
     return jsonify({"password": password})
 
-@app.route('/generate_email', methods=['GET'])
-def generate_random_email():
-    """Genera y devuelve un email aleatorio."""
-    email = generate_email()
-    return jsonify({"email": email})
+
 
 def generate_username():
     """Genera un nombre de usuario aleatorio."""
@@ -72,6 +73,19 @@ def generate_random_username():
     """Genera y devuelve un nombre de usuario aleatorio."""
     username = generate_username()
     return jsonify({"username": username})
+
+@app.route('/generate_custom_email', methods=['POST'])
+def generate_custom_email():
+    """Recibe las palabras clave y genera un email personalizado."""
+    data = request.json
+    names = [name.strip() for name in data.get('names', '').split(',') if name.strip()]
+    domains = [domain.strip() for domain in data.get('domains', '').split(',') if domain.strip()]
+    extensions = [ext.strip() for ext in data.get('extensions', '').split(',') if ext.strip()]
+
+    email = generate_email(names, domains, extensions)
+    return jsonify({"email": email})
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
