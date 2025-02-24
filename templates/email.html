@@ -6,58 +6,33 @@
   <title>Ironpass - Generador de Emails</title>
 
   <!-- Bootstrap CSS -->
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-  >
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Font Awesome (para iconos) -->
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
-    integrity="sha512-xh6OkZQdXr/0bWuWBOtbHb6PUmbZFzfkSJV1NfEVc6aQkdUsPTLkYaX09OG6yJl/IFmdJRvYdCmr6yyqSu2AiQ=="
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer"
-  />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
   
   <link rel="stylesheet" href="static/css/styles.css">
 </head>
 <body class="bg-light">
 
-  <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #444;">
     <div class="container-fluid px-4">
       <a class="navbar-brand d-flex align-items-center" href="/">
-        <img
-          src="/static/img/logo.png"
-          alt="Logo Ironpass"
-          style="height: 80px; margin-right: 16px;"
-        >
+        <img src="/static/img/logo.png" alt="Logo Ironpass" style="height: 80px; margin-right: 16px;">
       </a>
 
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
         <span class="navbar-toggler-icon"></span>
       </button>
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link" href="/genuser">Generador de usuarios</a>
+            <a class="nav-link active" href="/genuser">Generador de usuarios</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link active" href="/email">Generador de emails</a>
+            <a class="nav-link" href="/email">Generador de emails</a>
           </li>
         </ul>
-        <button id="toggle-theme-btn" class="btn" type="button" aria-label="Cambiar tema">
-          <i class="fa-solid fa-sun fa-lg"></i>
-        </button>
       </div>
     </div>
   </nav>
@@ -65,50 +40,50 @@
   <div class="container mt-5">
     <div class="card mx-auto p-4 shadow-sm" style="max-width: 700px;">
       <h2 class="text-center mb-4">Generador de Emails</h2>
-      <p>Personaliza los correos electrónicos generados con nombres, dominios y extensiones específicas.</p>
+      <p>Usa nuestro generador para crear direcciones de correo electrónico aleatorias y únicas.</p>
 
-      <!-- Campos de entrada para personalización -->
       <div class="mb-3">
-        <label for="names">Palabras clave (nombres):</label>
-        <input type="text" id="names" class="form-control" placeholder="Ej: Juan, Maria, Pedro">
-    </div>
-    
-    <div class="mb-3">
-        <label for="domains">Dominios personalizados:</label>
-        <input type="text" id="domains" class="form-control" placeholder="Ej: gmail, empresa, yahoo">
-    </div>
-    
-    <div class="mb-3">
-        <label for="extensions">Extensiones de correo:</label>
-        <input type="text" id="extensions" class="form-control" placeholder="Ej: .com, .net, .org">
-    </div>
-    
-    <button id="generate-email-btn" class="btn btn-primary mt-3">Generar Nuevo Email</button>
-    
-    <h4 class="mt-4">Historial de Emails Generados:</h4>
-    <ul id="email-history" class="list-group mt-2"></ul>
-    
-    <button id="download-history-btn" class="btn btn-success mt-3">Descargar Historial</button>
-    
-      <!-- Campo de resultado y botón de generación -->
-      <div class="mb-4 text-center">
-        <h5 class="mb-3">Email generado:</h5>
-        <input type="text" id="generated-email" class="form-control text-center" readonly>
-   
+        <label for="email-name" class="form-label">Nombre del correo:</label>
+        <input type="text" id="email-name" class="form-control" placeholder="Ej: juanperez">
+        <small class="text-danger d-none" id="name-error">Solo se permiten letras y números.</small>
+      </div>
+      
+      <div class="mb-3">
+        <label for="domain-selection" class="form-label">Selecciona un dominio:</label>
+        <select id="domain-selection" class="form-select">
+          <option value="gmail.com">gmail.com</option>
+          <option value="yahoo.com">yahoo.com</option>
+          <option value="outlook.com">outlook.com</option>
+          <option value="hotmail.com">hotmail.com</option>
+        </select>
       </div>
 
-      <h4 class="mt-4">¿Por qué usar emails generados?</h4>
-      <ul>
-        <li>Protege tu privacidad en registros en línea.</li>
-        <li>Evita el spam en tu bandeja de entrada principal.</li>
-        <li>Genera emails temporales para usos específicos.</li>
-      </ul>
+      <div class="mb-4 text-center">
+        <h5>Email generado:</h5>
+        <div class="input-group">
+          <input type="text" id="generated-email" class="form-control text-center" readonly>
+          <button id="copy-email-btn" class="btn btn-secondary">
+            <i class="fa-regular fa-copy"></i> Copiar
+          </button>
+        </div>
+        <button id="generate-email-btn" class="btn btn-primary mt-3">Generar Nuevo Email</button>
+      </div>
+
+      <h4 class="mt-4">Historial de Emails Generados</h4>
+      <ul id="email-history" class="list-group"></ul>
+
+      <button id="download-history-btn" class="btn btn-success mt-3">
+        <i class="fa-solid fa-download"></i> Descargar Historial
+      </button>
     </div>
   </div>
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- Script personalizado -->
   <script src="/static/js/email.js"></script>
 </body>
 </html>
+
+
+
+
