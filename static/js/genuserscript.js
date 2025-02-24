@@ -13,6 +13,8 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(data => {
                 usernameField.value = data.username;
                 addToHistory(data.username);
+                // Habilitar botón de copiar al generar un nombre
+                copyBtn.disabled = false;
             })
             .catch(error => console.error('Error:', error));
     }
@@ -36,29 +38,65 @@ document.addEventListener("DOMContentLoaded", function () {
         history.forEach(username => {
             const listItem = document.createElement("li");
             listItem.className = "list-group-item d-flex justify-content-between align-items-center";
+            listItem.setAttribute("data-username", username);
             listItem.textContent = username;
 
+            // Contenedor de botones
+            const buttonContainer = document.createElement("div");
+            buttonContainer.className = "d-flex gap-2";
+
+            // Botón de copiar
+            const copyBtnItem = document.createElement("button");
+            copyBtnItem.className = "btn btn-sm btn-grey";
+            copyBtnItem.innerHTML = '<i class="fa-solid fa-copy"></i>';
+            copyBtnItem.onclick = () => copySelected(username);
+
+            // Botón de eliminar
+            const deleteBtn = document.createElement("button");
+            deleteBtn.className = "btn btn-sm btn-danger";
+            deleteBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
+            deleteBtn.onclick = () => deleteFromHistory(username);
+
+            // Botón de descargar
             const downloadBtn = document.createElement("button");
             downloadBtn.className = "btn btn-sm btn-grey";
             downloadBtn.innerHTML = '<i class="fa-solid fa-download"></i>';
             downloadBtn.onclick = () => downloadSingle(username);
 
-            listItem.appendChild(downloadBtn);
+            // Agregar botones al contenedor
+            buttonContainer.appendChild(copyBtnItem);
+            buttonContainer.appendChild(deleteBtn);
+            buttonContainer.appendChild(downloadBtn);
+
+            // Agregar contenedor al elemento de historial
+            listItem.appendChild(buttonContainer);
             historyList.appendChild(listItem);
         });
+
+        // Actualizar estado del botón "Descargar Todos" según el historial
+        downloadAllBtn.disabled = history.length === 0;
+    }
+
+    function copySelected(username) {
+        navigator.clipboard.writeText(username)
+            .then(() => Swal.fire("Nombre copiado"))
+            .catch(err => console.error("Error al copiar:", err));
+    }
+
+    function deleteFromHistory(username) {
+        history = history.filter(user => user !== username);
+        updateHistoryList();
     }
 
     function copyToClipboard() {
         const copyText = usernameField.value;
         if (copyText.trim() === "") {
-            alert("No hay nombre de usuario para copiar.");
+            // Si no hay nombre generado, no se procede a copiar.
             return;
         }
-        navigator.clipboard.writeText(copyText).then(() => {
-            alert("¡Nombre copiado!");
-        }).catch(err => {
-            console.error("Error al copiar:", err);
-        });
+        navigator.clipboard.writeText(copyText)
+            .then(() => Swal.fire("¡Nombre copiado!"))
+            .catch(err => console.error("Error al copiar:", err));
     }
 
     function downloadSingle(username) {

@@ -1,86 +1,115 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const emailField  = document.getElementById("generated-email");
-  const generateBtn = document.getElementById("generate-email-btn");
-  const emailHistory = document.getElementById("email-history");
-  const downloadBtn = document.getElementById("download-history-btn");
+    const emailField = document.getElementById("generated-email");
+    const generateBtn = document.getElementById("generate-email-btn");
+    const copyBtn = document.getElementById("copy-email-btn");
+    const historyList = document.getElementById("email-history");
+    const downloadBtn = document.getElementById("download-history-btn");
+    const domainSelect = document.getElementById("domain-selection");
+    const emailNameInput = document.getElementById("email-name");
+    const nameError = document.getElementById("name-error");
 
-  let history = []; // Array para almacenar los emails generados
+    let emailHistory = [];
+    const maxHistory = 10; // Límite de historial
 
-  /**
-   * Función para copiar un email al portapapeles
-   */
-  function copyToClipboard(email) {
-      navigator.clipboard.writeText(email).then(() => {
-          alert("Correo copiado: " + email);
-      }).catch(err => {
-          console.error("Error al copiar: ", err);
-      });
-  }
+    function generarCadenaAleatoria(longitud) {
+        const caracteres = "abcdefghijklmnopqrstuvwxyz0123456789";
+        let resultado = "";
+        for (let i = 0; i < longitud; i++) {
+            resultado += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+        }
+        return resultado;
+    }
 
-  /**
-   * Actualiza la lista de historial con los emails generados
-   */
-  function updateHistory(email) {
-      if (history.length >= 10) {
-          history.shift(); // Elimina el más antiguo si hay más de 10
-      }
-      history.push(email);
+    function validarNombre(nombre) {
+        const regex = /^[a-zA-Z0-9]+$/; // Solo letras y números
+        return regex.test(nombre);
+    }
 
-      emailHistory.innerHTML = ""; // Limpia la lista
-      history.slice().reverse().forEach(email => {
-          const listItem = document.createElement("li");
-          listItem.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
+    function generarEmail() {
+        let nombre = emailNameInput.value.trim(); // Obtiene el nombre del input
 
-          listItem.innerHTML = `
-          <span>${email}</span>
-          <button class="btn btn-sm btn-outline-secondary copy-btn">
-              <i class="fa-solid fa-copy"></i> Copiar
-          </button>
-      `;
+        if (nombre !== "" && !validarNombre(nombre)) {
+            nameError.classList.remove("d-none"); // Muestra el mensaje de error
+            return;
+        } else {
+            nameError.classList.add("d-none"); // Oculta el mensaje si es válido
+        }
 
-          listItem.querySelector(".copy-btn").addEventListener("click", () => copyToClipboard(email));
+        if (nombre === "") {
+            // Si el campo está vacío, genera un nombre aleatorio
+            const nombres = [
+                "juan", "maria", "pedro", "laura", "carlos", "sofia", "diego", "ana",
+                "ricardo", "valentina", "daniel", "fernanda", "alex", "camila", "luis", "elena"
+            ];
+            nombre = nombres[Math.floor(Math.random() * nombres.length)];
+        }
 
-          emailHistory.appendChild(listItem);
-      });
-  }
+        let sufijo = generarCadenaAleatoria(4);
+        let dominio = domainSelect.value;
+        let email = `${nombre}.${sufijo}@${dominio}`;
 
-  /**
-   * Envia las palabras clave al backend y recibe un email generado
-   */
-  function generateEmail() {
-      const namesInput = document.getElementById("names").value;
-      const domainsInput = document.getElementById("domains").value;
-      const extensionsInput = document.getElementById("extensions").value;
+        emailField.value = email;
+        updateHistory(email);
+    }
 
-      fetch("/generate_custom_email", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-              names: namesInput,
-              domains: domainsInput,
-              extensions: extensionsInput
-          })
-      })
-      .then(response => response.json())
-      .then(data => {
-          emailField.value = data.email;
-          updateHistory(data.email);
-      })
-      .catch(error => console.error("Error al generar email:", error));
-  }
+    function updateHistory(email) {
+        // Agregar al inicio del array
+        emailHistory.unshift(email);
 
-  /**
-   * Función para descargar el historial como un archivo .txt
-   */
-  function downloadHistory() {
-      const text = history.join("\n");
-      const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "historial_emails.txt";
-      link.click();
-  }
+        // Mantener solo los últimos 10
+        if (emailHistory.length > maxHistory) {
+            emailHistory.pop();
+        }
 
-  generateBtn.addEventListener("click", generateEmail);
-  downloadBtn.addEventListener("click", downloadHistory);
+        renderHistory();
+    }
+
+    function renderHistory() {
+        historyList.innerHTML = ""; // Limpiar historial
+
+        emailHistory.forEach(email => {
+            let listItem = document.createElement("li");
+            listItem.className = "list-group-item d-flex justify-content-between align-items-center";
+            listItem.textContent = email;
+
+            let copyIcon = document.createElement("button");
+            copyIcon.className = "btn btn-sm btn-outline-secondary";
+            copyIcon.innerHTML = '<i class="fa-regular fa-copy"></i>';
+            copyIcon.addEventListener("click", function () {
+                navigator.clipboard.writeText(email);
+                alert("Email copiado: " + email);
+            });
+
+            listItem.appendChild(copyIcon);
+            historyList.appendChild(listItem);
+        });
+    }
+
+    function copyEmail() {
+        navigator.clipboard.writeText(emailField.value);
+        alert("Email copiado: " + emailField.value);
+    }
+
+    function downloadHistory() {
+        if (emailHistory.length === 0) {
+            alert("No hay emails en el historial.");
+            return;
+        }
+
+        let contenido = emailHistory.join("\n");
+        let blob = new Blob([contenido], { type: "text/plain" });
+        let enlace = document.createElement("a");
+
+        enlace.href = URL.createObjectURL(blob);
+        enlace.download = "historial_emails.txt";
+        document.body.appendChild(enlace);
+        enlace.click();
+        document.body.removeChild(enlace);
+    }
+
+    generarEmail();
+
+    generateBtn.addEventListener("click", generarEmail);
+    copyBtn.addEventListener("click", copyEmail);
+    downloadBtn.addEventListener("click", downloadHistory);
 });
