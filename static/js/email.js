@@ -69,46 +69,61 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function renderHistory() {
         historyList.innerHTML = "";
-
+    
         let start = (currentPage - 1) * emailsPerPage;
         let end = start + emailsPerPage;
         let paginatedEmails = emailHistory.slice(start, end);
-
-        paginatedEmails.forEach((email, index) => {
+    
+        paginatedEmails.forEach((email) => {
             let listItem = document.createElement("li");
             listItem.className = "list-group-item d-flex justify-content-between align-items-center";
-            listItem.textContent = email;
-
+    
+            // Texto del email a la izquierda
+            let emailText = document.createElement("span");
+            emailText.textContent = email;
+    
+            // Contenedor de botones (alineados a la derecha)
+            let buttonContainer = document.createElement("div");
+            buttonContainer.className = "d-flex gap-2"; // Espaciado entre botones
+    
             // Botón de copiar
             let copyIcon = document.createElement("button");
-            copyIcon.className = "btn btn-sm btn-outline-secondary";
-            copyIcon.innerHTML = '<i class="fa-regular fa-copy"></i>';
+            copyIcon.className = "btn btn-sm btn-light border shadow-sm rounded";
+            copyIcon.innerHTML = '<i class="fa-solid fa-copy"></i>';
             copyIcon.setAttribute("data-bs-toggle", "tooltip");
-            copyIcon.setAttribute("data-bs-placement", "top");
             copyIcon.setAttribute("title", "Copiar email");
             copyIcon.addEventListener("click", function () {
                 navigator.clipboard.writeText(email);
                 alert("Email copiado: " + email);
             });
-
+    
             // Botón de eliminar
             let deleteIcon = document.createElement("button");
-            deleteIcon.className = "btn btn-sm btn-outline-danger";
-            deleteIcon.innerHTML = '<i class="fa-regular fa-trash"></i>';
+            deleteIcon.className = "btn btn-sm btn-danger text-white shadow-sm rounded";
+            deleteIcon.innerHTML = '<i class="fa-solid fa-trash"></i>';
             deleteIcon.setAttribute("data-bs-toggle", "tooltip");
-            deleteIcon.setAttribute("data-bs-placement", "top");
             deleteIcon.setAttribute("title", "Eliminar email");
-            deleteIcon.addEventListener("click", function () {
-                emailHistory.splice(emailHistory.indexOf(email), 1);
-                renderHistory(); // Actualizar el historial después de eliminar
-            });
 
+            // Inicializar el tooltip para este botón
+            let tooltip = new bootstrap.Tooltip(deleteIcon);
+
+            deleteIcon.addEventListener("click", function () {
+                // Obtener la instancia del tooltip y ocultarlo antes de eliminar el email
+                let tooltipInstance = bootstrap.Tooltip.getInstance(deleteIcon);
+                if (tooltipInstance) {
+                    tooltipInstance.hide();
+                }
+
+                // Eliminar el email de la lista y volver a renderizar
+                emailHistory.splice(emailHistory.indexOf(email), 1);
+                renderHistory();
+            });
+    
             // Botón de descargar
             let downloadIcon = document.createElement("button");
-            downloadIcon.className = "btn btn-sm btn-outline-primary";
-            downloadIcon.innerHTML = '<i class="fa-regular fa-download"></i>';
+            downloadIcon.className = "btn btn-sm btn-light border shadow-sm rounded";
+            downloadIcon.innerHTML = '<i class="fa-solid fa-download"></i>';
             downloadIcon.setAttribute("data-bs-toggle", "tooltip");
-            downloadIcon.setAttribute("data-bs-placement", "top");
             downloadIcon.setAttribute("title", "Descargar email");
             downloadIcon.addEventListener("click", function () {
                 let blob = new Blob([email], { type: "text/plain" });
@@ -119,13 +134,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 enlace.click();
                 document.body.removeChild(enlace);
             });
-
-            listItem.appendChild(copyIcon);
-            listItem.appendChild(deleteIcon);
-            listItem.appendChild(downloadIcon);
+    
+            // Agregar botones al contenedor
+            buttonContainer.appendChild(copyIcon);
+            buttonContainer.appendChild(deleteIcon);
+            buttonContainer.appendChild(downloadIcon);
+    
+            // Agregar elementos a la lista
+            listItem.appendChild(emailText);
+            listItem.appendChild(buttonContainer);
             historyList.appendChild(listItem);
         });
-
+    
         updatePaginationButtons();
         activateTooltips();
     }
