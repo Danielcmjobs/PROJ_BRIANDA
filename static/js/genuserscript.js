@@ -190,9 +190,18 @@ document.addEventListener("DOMContentLoaded", function () {
     generateUsername();
 
     fetch('/get_history')
-        .then(response => response.json())
-        .then(data => {
-            history = data.history;
-            updateHistoryList();
-        });
+    .then(response => response.json())
+    .then(data => {
+        history = data.history;
+        updateHistoryList();
+        
+        // Generar un nuevo usuario solo si el historial está vacío
+        if (history.length === 0) {
+            generateUsername();
+        }
+    })
+    .catch(error => {
+        console.error("Error al obtener el historial:", error);
+        generateUsername(); // En caso de error, generar usuario de todos modos
+    });
 });
