@@ -4,16 +4,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const copyBtn = document.getElementById("copy-email-btn");
     const historyList = document.getElementById("email-history");
     const downloadBtn = document.getElementById("download-history-btn");
-    const prevPageBtn = document.getElementById("prev-page-btn");
-    const nextPageBtn = document.getElementById("next-page-btn");
     const domainSelect = document.getElementById("domain-selection");
     const nameInput = document.getElementById("email-name");
     const errorMessage = document.getElementById("error-message");
 
-    
     let emailHistory = [];
     let currentPage = 1;
     const emailsPerPage = 5;
+    const maxPagesVisible = 5; // Máximo de páginas visibles en la paginación
 
     function generarCadenaAleatoria(longitud) {
         const caracteres = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -66,21 +64,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function renderHistory() {
         historyList.innerHTML = "";
-    
+
         let start = (currentPage - 1) * emailsPerPage;
         let end = start + emailsPerPage;
         let paginatedEmails = emailHistory.slice(start, end);
-    
+
         paginatedEmails.forEach((email) => {
             let listItem = document.createElement("li");
             listItem.className = "list-group-item d-flex justify-content-between align-items-center";
-    
+
             let emailText = document.createElement("span");
             emailText.textContent = email;
-    
+
             let buttonContainer = document.createElement("div");
             buttonContainer.className = "d-flex gap-2";
-    
+
             let copyIcon = document.createElement("button");
             copyIcon.className = "btn btn-sm btn-light border shadow-sm rounded";
             copyIcon.innerHTML = '<i class="fa-solid fa-copy"></i>';
@@ -89,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function () {
             copyIcon.addEventListener("click", function () {
                 copiarEmail(email);
             });
-    
+
             let deleteIcon = document.createElement("button");
             deleteIcon.className = "btn btn-sm btn-danger text-white shadow-sm rounded";
             deleteIcon.innerHTML = '<i class="fa-solid fa-trash"></i>';
@@ -107,7 +105,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 emailHistory.splice(emailHistory.indexOf(email), 1);
                 renderHistory();
             });
-    
+
             let downloadIcon = document.createElement("button");
             downloadIcon.className = "btn btn-sm btn-light border shadow-sm rounded";
             downloadIcon.innerHTML = '<i class="fa-solid fa-download"></i>';
@@ -122,16 +120,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 enlace.click();
                 document.body.removeChild(enlace);
             });
-    
+
             buttonContainer.appendChild(copyIcon);
             buttonContainer.appendChild(deleteIcon);
             buttonContainer.appendChild(downloadIcon);
-    
+
             listItem.appendChild(emailText);
             listItem.appendChild(buttonContainer);
             historyList.appendChild(listItem);
         });
-    
+
         renderPagination();
         activateTooltips();
     }
@@ -139,11 +137,17 @@ document.addEventListener("DOMContentLoaded", function () {
     function renderPagination() {
         const paginationContainer = document.getElementById("pagination");
         paginationContainer.innerHTML = "";
-        
+
         const totalPages = Math.ceil(emailHistory.length / emailsPerPage);
-        
         if (totalPages <= 1) return;
-        
+
+        let startPage = Math.max(1, currentPage - Math.floor(maxPagesVisible / 2));
+        let endPage = Math.min(totalPages, startPage + maxPagesVisible - 1);
+
+        if (endPage - startPage + 1 < maxPagesVisible) {
+            startPage = Math.max(1, endPage - maxPagesVisible + 1);
+        }
+
         const prevButton = document.createElement("li");
         prevButton.className = `page-item ${currentPage === 1 ? "disabled" : ""}`;
         prevButton.innerHTML = `<a class="page-link" href="#">&#8592;</a>`;
@@ -151,23 +155,21 @@ document.addEventListener("DOMContentLoaded", function () {
             if (currentPage > 1) {
                 currentPage--;
                 renderHistory();
-                renderPagination();
             }
         });
         paginationContainer.appendChild(prevButton);
-        
-        for (let i = 1; i <= totalPages; i++) {
+
+        for (let i = startPage; i <= endPage; i++) {
             let pageItem = document.createElement("li");
             pageItem.className = `page-item ${i === currentPage ? "active" : ""}`;
             pageItem.innerHTML = `<a class="page-link" href="#">${i}</a>`;
             pageItem.addEventListener("click", function () {
                 currentPage = i;
                 renderHistory();
-                renderPagination();
             });
             paginationContainer.appendChild(pageItem);
         }
-        
+
         const nextButton = document.createElement("li");
         nextButton.className = `page-item ${currentPage === totalPages ? "disabled" : ""}`;
         nextButton.innerHTML = `<a class="page-link" href="#">&#8594;</a>`;
@@ -175,13 +177,10 @@ document.addEventListener("DOMContentLoaded", function () {
             if (currentPage < totalPages) {
                 currentPage++;
                 renderHistory();
-                renderPagination();
             }
         });
         paginationContainer.appendChild(nextButton);
     }
-    
-    
 
     function activateTooltips() {
         let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
@@ -189,8 +188,6 @@ document.addEventListener("DOMContentLoaded", function () {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
     }
-
-   
 
     generateBtn.addEventListener("click", generarEmail);
     copyBtn.addEventListener("click", function () {
@@ -225,5 +222,5 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     generarEmail();
-    
 });
+
